@@ -1,20 +1,61 @@
-import type { Config } from 'tailwindcss'
+import type { Config } from "tailwindcss";
+const colors = require("tailwindcss/colors");
 
 const config: Config = {
   content: [
-    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/library/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {
-      backgroundImage: {
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-conic':
-          'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+    screens: {
+      xs: "30em", // > 480px
+      sm: "38em", // > 608px
+      md: "48em", // > 768px
+      lg: "64em", // > 1024px
+      xl: "80em", // > 1280px
+    },
+    colors: {
+      transparent: "transparent",
+      slate: colors.slate,
+      black: colors.black,
+      white: colors.white,
+      primary: {
+        light: "#a1b9ce",
+        DEFAULT: "#155185",
+        dark: "#134978",
       },
+      secondary: {
+        light: "#f8c4a1",
+        DEFAULT: "#ED6C13",
+        dark: "#d56111",
+      },
+      text: {
+        DEFAULT: "#061828",
+      },
+    },
+    fontFamily: {
+      sans: [
+        "var(--font-inter)",
+        "ui-sans-serif",
+        "system-ui",
+        "-apple-system",
+        "BlinkMacSystemFont",
+        "Segoe UI",
+        "Roboto",
+        "Helvetica Neue",
+        "Arial",
+        "Noto Sans",
+        "sans-serif",
+        "Apple Color Emoji",
+        "Segoe UI Emoji",
+        "Segoe UI Symbol",
+        "Noto Color Emoji",
+      ],
+      logo: ["var(--font-logo)"],
     },
   },
   plugins: [],
-}
-export default config
+};
+export default config;
