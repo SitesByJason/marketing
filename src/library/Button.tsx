@@ -2,8 +2,9 @@ import { useRouter } from "next/router";
 
 type props = {
   children: any;
-  isOutlined?: boolean;
   isSecondary?: boolean;
+  isOutlined?: boolean;
+  isIcon?: boolean;
   href?: string;
   type?: "button" | "submit";
   isLarge?: boolean;
@@ -14,8 +15,9 @@ type props = {
 
 const LibButton: React.FC<props> = ({
   children,
-  isOutlined = false,
   isSecondary = false,
+  isOutlined = false,
+  isIcon = false,
   href,
   type = "button",
   isLarge = false,
@@ -66,23 +68,27 @@ const LibButton: React.FC<props> = ({
     };
     text = {
       color: "text-secondary",
-      hover: "text-secondary-dark",
-      disabled: "text-secondary-light",
+      hover: "hover:bg-secondary-dark",
+      disabled: "disabled:text-secondary-light",
     };
   }
 
-  let classes = `block border-2 ${border.color} ${border.hover} ${border.disabled} rounded-md font-bold disabled:cursor-not-allowed`;
+  let classes = `block border ${border.color} ${border.hover} ${border.disabled} font-bold uppercase tracking-wide disabled:cursor-not-allowed`;
 
-  if (isOutlined) {
-    classes += ` bg-transparent ${text.color} ${text.hover} ${text.disabled}`;
+  if (isIcon) {
+    classes += ` bg-transparent border-none ${text.color} ${text.hover} ${text.disabled}`;
+  } else if (isOutlined) {
+    classes += ` bg-transparent rounded-md ${background.hover} ${text.color} hover:text-white ${text.disabled}`;
   } else {
-    classes += ` ${background.color} ${background.hover} ${background.disabled} text-white`;
+    classes += ` rounded-md ${background.color} ${background.hover} ${background.disabled} text-white`;
   }
 
-  if (isLarge) {
-    classes += " py-1.5 px-6 text-2xl";
+  if (isIcon) {
+    classes += ` py-1.5 px-2`;
+  } else if (isLarge) {
+    classes += " py-2 px-6 text-2xl";
   } else {
-    classes += " py-0.5 px-4";
+    classes += " py-1 px-4";
   }
 
   return (

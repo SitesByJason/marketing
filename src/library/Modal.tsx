@@ -5,6 +5,7 @@ import ModalContext from "@/state/modal.context";
 
 type props = {
   children: any;
+  footer: any;
   heading?: string;
   showHeader?: boolean;
   closeOnBackdropClick?: boolean;
@@ -12,6 +13,7 @@ type props = {
 
 const LibModal: React.FC<props> = ({
   children,
+  footer,
   heading,
   showHeader = true,
   closeOnBackdropClick = true,
@@ -36,7 +38,8 @@ const LibModal: React.FC<props> = ({
             <div className="py-1 border-b border-slate-200">
               {showHeader && (
                 <div className="flex justify-between items-center">
-                  <h3 className="px-2 text-xl font-bold">{heading}</h3>
+                  <h3 className="pl-6 pr-4 text-xl font-bold">{heading}</h3>
+
                   <div
                     className="p-2 text-slate-500 hover:text-secondary cursor-pointer"
                     onClick={closeModal.bind("close", true)}
@@ -47,9 +50,11 @@ const LibModal: React.FC<props> = ({
               )}
             </div>
 
-            <div className="grow overflow-y-auto font-sans">{children}</div>
+            <div className="grow overflow-y-auto">{children}</div>
 
-            <div className="py-1 border-t border-slate-200"></div>
+            <div className="flex items-center h-16 py-2 px-4 border-t border-slate-300">
+              {footer}
+            </div>
           </div>
         </div>,
         document.getElementById("modal")!

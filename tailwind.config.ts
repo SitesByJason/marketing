@@ -21,6 +21,7 @@ const config: Config = {
       slate: colors.slate,
       black: colors.black,
       white: colors.white,
+      red: "#B22727",
       primary: {
         light: "#a1b9ce",
         DEFAULT: "#155185",
@@ -39,6 +40,6 @@ const config: Config = {
       logo: ["var(--font-logo)"],
     },
   },
-  plugins: [],
+  plugins: [require("@tailwindcss/forms")],
 };
 export default config;

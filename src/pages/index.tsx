@@ -1,5 +1,5 @@
 import ConversationModal from "@/components/ConversationModal";
-import PageHeader from "@/components/PageHeader";
+import PageHeader from "@/layout/PageHeader";
 import LibButton from "@/library/Button";
 import LibContainer from "@/library/Container";
 import ModalContext from "@/state/modal.context";
@@ -33,7 +33,7 @@ const HomePage: React.FC = () => {
         <p className="mb-8 text-2xl md:text-3xl text-center font-semibold">
           Hello my name is Jason,
           <br />
-          I'm an Artifical Developer.
+          I'm your friendly artifical developer.
         </p>
 
         <div className="sm:flex sm:items-end">
@@ -91,11 +91,11 @@ const HomePage: React.FC = () => {
         </div>
 
         <p className="text-center font-italic">
-          BTW I'm currently working on{" "}
+          BTW I'm starting with{" "}
           <span className="block text-lg text-primary font-semibold">
-            Real Estate Investor Websites
+            Real Estate Investor Sites
           </span>{" "}
-          but please let me know what type I should learn next :)
+          but I'll be working on more soon :)
         </p>
       </LibContainer>
 
