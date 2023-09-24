@@ -1,3 +1,4 @@
+import UsersAPI from "@/api/users.api";
 import { PotentialBusinessTypes } from "@/data/potential-business-types.const";
 import { InteractionsEnum } from "@/enums/interactions.enum";
 import { IMessage } from "@/interfaces/message.interface";
@@ -15,6 +16,7 @@ type context = {
   HasNotLearnedAboutPricing: boolean;
   HasNotLearnedAboutHowItllWork: boolean;
   HasNotLearnedAboutMe: boolean;
+  UserId: number;
   resetConversation: () => void;
   giveName: (firstName: string, lastName: string) => void;
   sayYesToUpdates: () => void;
@@ -51,6 +53,7 @@ const ConversationContext = createContext<context>({
   HasNotLearnedAboutPricing: true,
   HasNotLearnedAboutHowItllWork: true,
   HasNotLearnedAboutMe: true,
+  UserId: 1,
   resetConversation: () => {},
   giveName: () => {},
   sayYesToUpdates: () => {},
@@ -94,6 +97,7 @@ export const ConversationContextProvider: FC<props> = ({ children }) => {
     useState<boolean>(true);
   const [HasNotLearnedAboutMe, setHasNotLearnedAboutMe] =
     useState<boolean>(true);
+  const [UserId, setUserId] = useState<number>(1);
 
   function resetConversation() {
     setCurrentInteraction(firstInteraction);
@@ -159,6 +163,21 @@ export const ConversationContextProvider: FC<props> = ({ children }) => {
 
   /**
    * ----------------------------------
+   * API Functions
+   * ----------------------------------
+   */
+  function saveUser(firstName: string, lastName: string, email: string) {
+    UsersAPI.store(firstName, lastName, email).then((response) => {
+      setUserId(response.data.data.id);
+    });
+  }
+
+  function updateUser(businessType: string) {
+    UsersAPI.update(UserId, businessType);
+  }
+
+  /**
+   * ----------------------------------
    * Conversation Steps
    * ----------------------------------
    */
@@ -219,6 +238,8 @@ export const ConversationContextProvider: FC<props> = ({ children }) => {
 
     addMessageVisitor(`My email address is ${emailAddress}`);
 
+    saveUser(FirstName, LastName, emailAddress);
+
     addMessageJason(
       "Thanks for your email address, I'll keep it to myself. <br>No SPAM here.",
       !!BusinessType ? askIfTheyWantInfo : askIfRealEstateInvestor
@@ -238,6 +259,8 @@ export const ConversationContextProvider: FC<props> = ({ children }) => {
     setCurrentInteraction(null);
 
     addMessageVisitor("Yes, I am a Real Estate Investor");
+
+    updateUser("Real Estate Investor");
 
     addMessageJason(
       "Great, then you'll be perfectly suited for one of my sites.",
@@ -261,6 +284,8 @@ export const ConversationContextProvider: FC<props> = ({ children }) => {
     setBusinessType(businessType);
 
     addMessageVisitor(`I own a ${businessType}`);
+
+    updateUser(businessType);
 
     // Their business type is on the list
     if (checkPotentialBusinessTypes(businessType)) {
@@ -450,6 +475,7 @@ export const ConversationContextProvider: FC<props> = ({ children }) => {
     HasNotLearnedAboutPricing,
     HasNotLearnedAboutHowItllWork,
     HasNotLearnedAboutMe,
+    UserId,
     resetConversation,
     giveName,
     sayYesToUpdates,

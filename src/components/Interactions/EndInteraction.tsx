@@ -1,13 +1,16 @@
+import ConversationsAPI from "@/api/conversations.api";
 import LibButton from "@/library/Button";
 import ConversationContext from "@/state/conversation.context";
 import ModalContext from "@/state/modal.context";
 import { useContext } from "react";
 
 const EndInteraction: React.FC = () => {
-  const { resetConversation } = useContext(ConversationContext);
+  const { resetConversation, UserId, Messages } =
+    useContext(ConversationContext);
   const { closeModal } = useContext(ModalContext);
 
   function closeConversation() {
+    ConversationsAPI.store(UserId, Messages);
     resetConversation();
     closeModal();
   }
