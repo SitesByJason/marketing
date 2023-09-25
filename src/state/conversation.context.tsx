@@ -6,6 +6,8 @@ import { IUser } from "@/interfaces/user.interface";
 import { FC, createContext, useState } from "react";
 var pluralize = require("pluralize");
 
+const jasonsTypingSpeedInSeconds = 48;
+
 type context = {
   CurrentInteraction: InteractionsEnum | null;
   Messages: IMessage[];
@@ -78,7 +80,7 @@ export const ConversationContextProvider: FC<props> = ({ children }) => {
    * ----------------------------------
    */
   const firstMessage = {
-    content: "Howdy, can I get your first and last name?",
+    content: "Howdy, can start by getting your name?",
     isJason: true,
   };
   const firstInteraction = InteractionsEnum.Name;
@@ -86,23 +88,29 @@ export const ConversationContextProvider: FC<props> = ({ children }) => {
   const [CurrentInteraction, setCurrentInteraction] = useState<number | null>(
     firstInteraction
   );
+
   const [Messages, setMessages] = useState<IMessage[]>([firstMessage]);
   const [MessageCount, setMessageCount] = useState<number>(0);
+
   const [FirstName, setFirstName] = useState<string>("");
   const [LastName, setLastName] = useState<string>("");
   const [Email, setEmail] = useState<string>("");
   const [BusinessType, setBusinessType] = useState<string>("");
+
+  const [User, setUser] = useState<IUser>({
+    first_name: "",
+    last_name: "",
+    email_address: "",
+  });
+
+  const [HasStartedLearning, setHasStartedLearning] = useState<boolean>(false);
+
   const [HasNotLearnedAboutPricing, setHasNotLearnedAboutPricing] =
     useState<boolean>(true);
   const [HasNotLearnedAboutHowItllWork, setHasNotLearnedAboutHowItllWork] =
     useState<boolean>(true);
   const [HasNotLearnedAboutMe, setHasNotLearnedAboutMe] =
     useState<boolean>(true);
-  const [User, setUser] = useState<IUser>({
-    first_name: "",
-    last_name: "",
-    email_address: "",
-  });
 
   function resetConversation() {
     setCurrentInteraction(firstInteraction);
@@ -146,7 +154,7 @@ export const ConversationContextProvider: FC<props> = ({ children }) => {
     addMessage("...", true);
 
     const chars = content.length;
-    const typingTimeInSeconds = chars / 50; // chars/second
+    const typingTimeInSeconds = chars / jasonsTypingSpeedInSeconds;
 
     window.setTimeout(() => {
       removeLastMessage();
@@ -171,11 +179,10 @@ export const ConversationContextProvider: FC<props> = ({ children }) => {
    * API Functions
    * ----------------------------------
    */
-  function saveUser(firstName: string, lastName: string, email: string) {
+  function saveUser(firstName: string, lastName: string) {
     const user: IUser = {
       first_name: firstName,
       last_name: lastName,
-      email_address: email,
     };
 
     api.users.store(user).then((response) => {
@@ -183,11 +190,26 @@ export const ConversationContextProvider: FC<props> = ({ children }) => {
     });
   }
 
-  function updateUser(businessType: string) {
+  function updateUser(businessType: string | null, email: string | null) {
     const user = User;
-    user.business_type = businessType;
 
-    api.users.update(user);
+    if (user && user.id) {
+      if (email) user.email_address = email;
+      if (businessType) user.business_type = businessType;
+
+      api.users.update(user);
+    } else {
+      const user: IUser = {
+        first_name: FirstName,
+        last_name: LastName,
+        email_address: email || Email,
+        business_type: businessType || BusinessType,
+      };
+
+      api.users.store(user).then((response) => {
+        setUser(response.data.data);
+      });
+    }
   }
 
   function saveConversation() {
@@ -207,62 +229,13 @@ export const ConversationContextProvider: FC<props> = ({ children }) => {
     setFirstName(firstName);
     setLastName(lastName);
 
+    saveUser(firstName, lastName);
+
     addMessageVisitor(`My name is ${firstName} ${lastName}`);
 
-    addMessageJason(`It's nice to meet you ${firstName}`, askAboutUpdates);
-  }
-
-  function askAboutUpdates() {
     addMessageJason(
-      "Would you like to receive updates about SitesByJason?",
-      setCurrentInteraction.bind("", InteractionsEnum.Updates)
-    );
-  }
-
-  function sayYesToUpdates() {
-    setCurrentInteraction(null);
-
-    addMessageVisitor("Yes, I Would");
-
-    askForEmailAddress();
-  }
-
-  function sayNoToUpdates() {
-    setCurrentInteraction(null);
-
-    addMessageVisitor("No Thanks");
-
-    // This is the first time they said no to updates
-    if (!BusinessType) {
-      addMessageJason(
-        "No worries, you can always check back here in the future to see my progress.",
-        askIfRealEstateInvestor
-      );
-    }
-    // This is the second time they said no to updates
-    else {
-      addMessageJason("No worries, I understand.", askIfTheyWantInfo);
-    }
-  }
-
-  function askForEmailAddress() {
-    addMessageJason(
-      "Awesome, I just need your email address.",
-      setCurrentInteraction.bind("", InteractionsEnum.Email)
-    );
-  }
-
-  function giveEmailAddress(emailAddress: string) {
-    setCurrentInteraction(null);
-    setEmail(emailAddress);
-
-    addMessageVisitor(`My email address is ${emailAddress}`);
-
-    saveUser(FirstName, LastName, emailAddress);
-
-    addMessageJason(
-      "Thanks for your email address, I'll keep it to myself. <br>No SPAM here.",
-      !!BusinessType ? askIfTheyWantInfo : askIfRealEstateInvestor
+      `It's nice to meet you ${firstName}`,
+      askIfRealEstateInvestor
     );
   }
 
@@ -280,12 +253,20 @@ export const ConversationContextProvider: FC<props> = ({ children }) => {
 
     addMessageVisitor("Yes, I am a Real Estate Investor");
 
-    updateUser("Real Estate Investor");
+    updateUser("Real Estate Investor", null);
 
-    addMessageJason(
-      "Great, then you'll be perfectly suited for one of my sites.",
-      askIfTheyWantInfo
-    );
+    // They've already given email address
+    if (Email.length) {
+      addMessageJason(
+        "Great, I'd love to build your next site",
+        askIfTheyWantInfo
+      );
+    } else {
+      addMessageJason(
+        "Great, I'd love to build your next site. Would you like me to update you when I'm ready?",
+        setCurrentInteraction.bind("", InteractionsEnum.Updates)
+      );
+    }
   }
 
   function sayNoToRealEstateInvestor() {
@@ -303,9 +284,9 @@ export const ConversationContextProvider: FC<props> = ({ children }) => {
     setCurrentInteraction(null);
     setBusinessType(businessType);
 
-    addMessageVisitor(`I own a ${businessType}`);
+    addMessageVisitor(`${businessType}`);
 
-    updateUser(businessType);
+    updateUser(businessType, null);
 
     // Their business type is on the list
     if (checkPotentialBusinessTypes(businessType)) {
@@ -314,7 +295,7 @@ export const ConversationContextProvider: FC<props> = ({ children }) => {
         addMessageJason(
           `${pluralize(
             businessType
-          )} are on my list of potential sites! <br>I'll send you an email when I start working on it and see if you want to be part of the early testing group.`,
+          )} are on my list of potential sites! <br>I'll send you an email when I start building them.`,
           askIfTheyWantInfo
         );
       }
@@ -323,25 +304,87 @@ export const ConversationContextProvider: FC<props> = ({ children }) => {
         addMessageJason(
           `${pluralize(
             businessType
-          )} is on my list of potential sites. Would you like me to update you when I start working on it?`,
+          )} are on my list of potential sites. <br> Would you like me to update you when I building them?`,
           setCurrentInteraction.bind("", InteractionsEnum.Updates)
         );
       }
     }
     // Their business type is not on the list
     else {
-      addMessageJason(
-        `${pluralize(
-          businessType
-        )} aren't on my current list of sites to build, but I'll look into it.`,
-        askIfTheyWantInfo
-      );
+      // They've already given email address
+      if (Email.length) {
+        addMessageJason(
+          `${pluralize(
+            businessType
+          )} aren't on my current list of sites to build, but I'll look into it`,
+          askIfTheyWantInfo
+        );
+      }
+      // They didn't give email address so check again
+      else {
+        addMessageJason(
+          `${pluralize(
+            businessType
+          )} aren't on my current list of sites to build, but I'll look into it. <br>Would you like me to update you?`,
+          setCurrentInteraction.bind("", InteractionsEnum.Updates)
+        );
+      }
+    }
+  }
+
+  function sayYesToUpdates() {
+    setCurrentInteraction(null);
+
+    addMessageVisitor("Yes, I would");
+
+    askForEmailAddress();
+  }
+
+  function sayNoToUpdates() {
+    setCurrentInteraction(null);
+
+    addMessageVisitor("No Thanks");
+
+    if (HasStartedLearning) {
+      addMessageJason("No problem", endConversation);
+    } else {
+      addMessageJason("No worries", askIfTheyWantInfo);
+    }
+  }
+
+  function askForEmailAddress() {
+    addMessageJason(
+      "Awesome, I just need your email address",
+      addMessageJason.bind(
+        "",
+        "BTW I'll keep this to myself and promise not to bother you too much",
+        setCurrentInteraction.bind("", InteractionsEnum.Email)
+      )
+    );
+  }
+
+  function giveEmailAddress(emailAddress: string) {
+    setCurrentInteraction(null);
+    setEmail(emailAddress);
+
+    addMessageVisitor(`My email address is ${emailAddress}`);
+
+    updateUser(null, emailAddress);
+
+    const message = "Thanks for giving me your email";
+
+    if (HasStartedLearning) {
+      addMessageJason(message, endConversation);
+    } else {
+      addMessageJason(message, askIfTheyWantInfo);
     }
   }
 
   function askIfTheyWantInfo() {
+    setHasStartedLearning(true);
+
     addMessageJason(
-      "That's all the questions I have. Would you like to know anything about me?",
+      "Would you like to know anything about me?",
       setCurrentInteraction.bind("", InteractionsEnum.MoreInfo)
     );
   }
@@ -349,10 +392,10 @@ export const ConversationContextProvider: FC<props> = ({ children }) => {
   function sayYesToInfo() {
     setCurrentInteraction(null);
 
-    addMessageVisitor("Yes I Would");
+    addMessageVisitor("Yeah I have some questions");
 
     addMessageJason(
-      "Great, what would you like to know about?",
+      "What can I answer for you?",
       setCurrentInteraction.bind("", InteractionsEnum.Learn)
     );
   }
@@ -362,28 +405,28 @@ export const ConversationContextProvider: FC<props> = ({ children }) => {
 
     addMessageVisitor("Not Really");
 
-    endConversation();
+    if (!Email.length) {
+      askForEmailAddressAgain();
+    } else {
+      endConversation();
+    }
   }
 
   function learnAboutPricing() {
     setCurrentInteraction(null);
     setHasNotLearnedAboutPricing(false);
 
-    addMessageVisitor("I'd like to know about pricing.");
+    addMessageVisitor("I'd like to know about pricing");
 
     addMessageJason(
-      "I don't have pricing fully worked out yet",
+      "I don't have my pricing fully worked out yet",
       addMessageJason.bind(
         "",
-        "But it'll probably be around $30/mo give or take.",
-        addMessageJason.bind(
-          "",
-          "I might also have some add ons in the future for an additional cost",
-          askWhatElse
-            .bind("learnedAboutPricing", true)
-            .bind("learnedAboutHowItllWork", !HasNotLearnedAboutHowItllWork)
-            .bind("learnedAboutMe", !HasNotLearnedAboutMe)
-        )
+        "But it'll probably be around $30/mo give or take",
+        askWhatElse
+          .bind("learnedAboutPricing", true)
+          .bind("learnedAboutHowItllWork", !HasNotLearnedAboutHowItllWork)
+          .bind("learnedAboutMe", !HasNotLearnedAboutMe)
       )
     );
   }
@@ -395,21 +438,17 @@ export const ConversationContextProvider: FC<props> = ({ children }) => {
     addMessageVisitor("How will it work?");
 
     addMessageJason(
-      "I need some information about your business.",
+      "We'll have a brief conversation about your business and discuss some details for your website",
       addMessageJason.bind(
         "",
-        "Then I'll create a website that comes with all the content, images, and settings all ready to go.",
+        "Then I'll take care of everything from there",
         addMessageJason.bind(
           "",
-          "Of course you'll have the option to edit the website yourself afterwards.",
-          addMessageJason.bind(
-            "",
-            "Finally I'll host the website and make sure it's always ready for your visitors.",
-            askWhatElse
-              .bind("learnedAboutPricing", !HasNotLearnedAboutPricing)
-              .bind("learnedAboutHowItllWork", true)
-              .bind("learnedAboutMe", !HasNotLearnedAboutMe)
-          )
+          "Including writing content, choosing images, and hosting the website.",
+          askWhatElse
+            .bind("learnedAboutPricing", !HasNotLearnedAboutPricing)
+            .bind("learnedAboutHowItllWork", true)
+            .bind("learnedAboutMe", !HasNotLearnedAboutMe)
         )
       )
     );
@@ -422,22 +461,14 @@ export const ConversationContextProvider: FC<props> = ({ children }) => {
     addMessageVisitor("What does it mean to be an artifical developer?");
 
     addMessageJason(
-      "I'm really just a program. So not a real boy :(",
+      "I'm really just a program. So I'm not a real boy :(",
       addMessageJason.bind(
         "",
-        "But I do use Artificial Intelligence so I will be able to do a lot of cool things.",
-        addMessageJason.bind(
-          "",
-          "Like write content and choose images for your site.",
-          addMessageJason.bind(
-            "",
-            "And manage all the details of your site so you don't have to.",
-            askWhatElse
-              .bind("learnedAboutPricing", !HasNotLearnedAboutPricing)
-              .bind("learnedAboutHowItllWork", !HasNotLearnedAboutHowItllWork)
-              .bind("learnedAboutMe", true)
-          )
-        )
+        "Instead I use Artificial Intelligence to build and manage your site.",
+        askWhatElse
+          .bind("learnedAboutPricing", !HasNotLearnedAboutPricing)
+          .bind("learnedAboutHowItllWork", !HasNotLearnedAboutHowItllWork)
+          .bind("learnedAboutMe", true)
       )
     );
   }
@@ -455,25 +486,42 @@ export const ConversationContextProvider: FC<props> = ({ children }) => {
 
     if (continueLearning) {
       addMessageJason(
-        "Would you like to know about else?",
+        "Would you like to know about anything else?",
         setCurrentInteraction.bind("", InteractionsEnum.Learn)
       );
     } else {
-      endConversation();
+      addMessageVisitor("That's all of my questions");
+
+      if (!Email.length) {
+        askForEmailAddressAgain();
+      } else {
+        endConversation();
+      }
     }
   }
 
   function sayNoToAnythingElse() {
     setCurrentInteraction(null);
 
-    addMessageVisitor("No Thanks");
+    addMessageVisitor("No thanks I'm good");
 
-    endConversation();
+    if (!Email.length) {
+      askForEmailAddressAgain();
+    } else {
+      endConversation();
+    }
+  }
+
+  function askForEmailAddressAgain() {
+    addMessageJason(
+      `Would you like to receive updates?`,
+      setCurrentInteraction.bind("", InteractionsEnum.Updates)
+    );
   }
 
   function endConversation() {
     addMessageJason(
-      "Well, that's it for now. I hope you have an outstanding day!",
+      "It's been great chatting with you. I hope you have an outstanding day!",
       setCurrentInteraction.bind("", InteractionsEnum.End)
     );
   }

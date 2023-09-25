@@ -39,20 +39,21 @@ const HomePage: React.FC = () => {
         <div className="sm:flex sm:items-end">
           <div>
             <p className="mb-4 text-xl">
-              With just a bit of information from you I can build you a complete
-              website in{" "}
+              With conversation that will take{" "}
               <span className="font-semibold underline">
                 30 minutes or less
-              </span>
-              . One specifically built for your type of business.
+              </span>{" "}
+              I can build you a complete website. One specifically built for
+              your type of business.
             </p>
 
             <div className="flex items-end sm:block">
               <div className="shrink">
                 <p className="text-xl">
                   Well... I will be able to once I finish my training. This is
-                  actually my coming soon page. So, if this interests you click
-                  the button below and{" "}
+                  actually my coming soon page. So, if getting a site up and
+                  running with minimal effort interests you click the button
+                  below and{" "}
                   <span className="font-semibold underline">
                     let's have a quick conversation
                   </span>
