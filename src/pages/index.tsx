@@ -61,7 +61,7 @@ const HomePage: React.FC = () => {
               </div>
               <div className="shrink-0 basis-24 sm:hidden">
                 <Image
-                  src="/images/posing/jason-posing-hands-in-pocket.png"
+                  src="https://cdn.sitesbyjason.com/jason/poses/hands-in-pocket.png"
                   alt="Jason Standing"
                   width={360}
                   height={550}
@@ -72,7 +72,7 @@ const HomePage: React.FC = () => {
 
           <div className="hidden shrink-0 basis-28 sm:block">
             <Image
-              src="/images/posing/jason-posing-hands-in-pocket.png"
+              src="https://cdn.sitesbyjason.com/jason/poses/hands-in-pocket.png"
               alt="Jason Standing"
               width={360}
               height={550}

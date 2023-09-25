@@ -6,7 +6,7 @@ const PageHeader: React.FC = () => {
     <LibContainer className="flex justify-center py-6">
       <div className="flex items-center">
         <Image
-          src="/images/avatars/jason-avatar-yay.png"
+          src="https://cdn.sitesbyjason.com/jason/avatars/yay.png"
           alt="Jason"
           width={48}
           height={48}

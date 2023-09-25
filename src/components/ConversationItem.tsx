@@ -72,7 +72,7 @@ const ConversationItem: React.FC<props> = ({
         <div className="w-10">
           {!isPreviousSame && (
             <Image
-              src="/images/avatars/jason-avatar-yay.png"
+              src="https://cdn.sitesbyjason.com/jason/avatars/yay.png"
               alt="Jason"
               width={36}
               height={36}

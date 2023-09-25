@@ -1,7 +1,8 @@
-import UsersAPI from "@/api/users.api";
+import api from "@/api";
 import { PotentialBusinessTypes } from "@/data/potential-business-types.const";
 import { InteractionsEnum } from "@/enums/interactions.enum";
 import { IMessage } from "@/interfaces/message.interface";
+import { IUser } from "@/interfaces/user.interface";
 import { FC, createContext, useState } from "react";
 var pluralize = require("pluralize");
 
@@ -16,7 +17,7 @@ type context = {
   HasNotLearnedAboutPricing: boolean;
   HasNotLearnedAboutHowItllWork: boolean;
   HasNotLearnedAboutMe: boolean;
-  UserId: number;
+  saveConversation: () => void;
   resetConversation: () => void;
   giveName: (firstName: string, lastName: string) => void;
   sayYesToUpdates: () => void;
@@ -53,7 +54,7 @@ const ConversationContext = createContext<context>({
   HasNotLearnedAboutPricing: true,
   HasNotLearnedAboutHowItllWork: true,
   HasNotLearnedAboutMe: true,
-  UserId: 1,
+  saveConversation: () => {},
   resetConversation: () => {},
   giveName: () => {},
   sayYesToUpdates: () => {},
@@ -97,7 +98,11 @@ export const ConversationContextProvider: FC<props> = ({ children }) => {
     useState<boolean>(true);
   const [HasNotLearnedAboutMe, setHasNotLearnedAboutMe] =
     useState<boolean>(true);
-  const [UserId, setUserId] = useState<number>(1);
+  const [User, setUser] = useState<IUser>({
+    first_name: "",
+    last_name: "",
+    email_address: "",
+  });
 
   function resetConversation() {
     setCurrentInteraction(firstInteraction);
@@ -141,7 +146,7 @@ export const ConversationContextProvider: FC<props> = ({ children }) => {
     addMessage("...", true);
 
     const chars = content.length;
-    const typingTimeInSeconds = chars / 35; // chars/second
+    const typingTimeInSeconds = chars / 50; // chars/second
 
     window.setTimeout(() => {
       removeLastMessage();
@@ -167,13 +172,28 @@ export const ConversationContextProvider: FC<props> = ({ children }) => {
    * ----------------------------------
    */
   function saveUser(firstName: string, lastName: string, email: string) {
-    UsersAPI.store(firstName, lastName, email).then((response) => {
-      setUserId(response.data.data.id);
+    const user: IUser = {
+      first_name: firstName,
+      last_name: lastName,
+      email_address: email,
+    };
+
+    api.users.store(user).then((response) => {
+      setUser(response.data.data);
     });
   }
 
   function updateUser(businessType: string) {
-    UsersAPI.update(UserId, businessType);
+    const user = User;
+    user.business_type = businessType;
+
+    api.users.update(user);
+  }
+
+  function saveConversation() {
+    if (User && User.id) {
+      api.conversations.store({ user_id: User.id, messages: Messages });
+    }
   }
 
   /**
@@ -475,7 +495,7 @@ export const ConversationContextProvider: FC<props> = ({ children }) => {
     HasNotLearnedAboutPricing,
     HasNotLearnedAboutHowItllWork,
     HasNotLearnedAboutMe,
-    UserId,
+    saveConversation,
     resetConversation,
     giveName,
     sayYesToUpdates,

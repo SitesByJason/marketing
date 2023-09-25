@@ -9,6 +9,7 @@ type props = {
   heading?: string;
   showHeader?: boolean;
   closeOnBackdropClick?: boolean;
+  onClose?: () => void;
 };
 
 const LibModal: React.FC<props> = ({
@@ -17,12 +18,15 @@ const LibModal: React.FC<props> = ({
   heading,
   showHeader = true,
   closeOnBackdropClick = true,
+  onClose,
 }) => {
   const modalContext = useContext(ModalContext);
 
   function closeModal(close = false) {
     if (close) {
       modalContext.closeModal();
+
+      if (onClose) onClose();
     }
   }
 

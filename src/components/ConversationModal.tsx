@@ -13,8 +13,13 @@ import MoreInfoInteraction from "./Interactions/MoreInfoInteraction";
 import EndInteraction from "./Interactions/EndInteraction";
 
 const ConversationModal: React.FC = () => {
-  const { Messages, MessageCount, CurrentInteraction } =
-    useContext(ConversationContext);
+  const {
+    saveConversation,
+    resetConversation,
+    Messages,
+    MessageCount,
+    CurrentInteraction,
+  } = useContext(ConversationContext);
 
   let content = null;
 
@@ -62,8 +67,13 @@ const ConversationModal: React.FC = () => {
     }
   }, [MessageCount]);
 
+  function onCloseModal() {
+    saveConversation();
+    resetConversation();
+  }
+
   return (
-    <LibModal heading="Let's Talk" footer={content}>
+    <LibModal heading="Let's Talk" footer={content} onClose={onCloseModal}>
       <div className="flex flex-col h-full">
         <div className="grow flex flex-col-reverse px-4 bg-slate-100">
           {/* This needs to be here because of the flex-col-reverse */}

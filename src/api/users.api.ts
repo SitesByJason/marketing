@@ -1,17 +1,12 @@
+import { IUser } from "@/interfaces/user.interface";
 import axios from "axios";
 
-function store(firstName: string, lastName: string, email: string) {
-  return axios.post(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
-    first_name: firstName,
-    last_name: lastName,
-    email_address: email,
-  });
+function store(user: IUser) {
+  return axios.post(`${process.env.NEXT_PUBLIC_API_URL}/users`, user);
 }
 
-function update(userId: number, businessType: string) {
-  return axios.put(`${process.env.NEXT_PUBLIC_API_URL}/users/${userId}`, {
-    business_type: businessType,
-  });
+function update(user: IUser) {
+  return axios.put(`${process.env.NEXT_PUBLIC_API_URL}/users/${user.id}`, user);
 }
 
 const UsersAPI = {
