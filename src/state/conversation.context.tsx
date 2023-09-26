@@ -514,7 +514,7 @@ export const ConversationContextProvider: FC<props> = ({ children }) => {
 
   function askForEmailAddressAgain() {
     addMessageJason(
-      `Would you like to receive updates?`,
+      `Before you go would you like to receive updates?`,
       setCurrentInteraction.bind("", InteractionsEnum.Updates)
     );
   }
