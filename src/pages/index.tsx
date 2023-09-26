@@ -33,7 +33,7 @@ const HomePage: React.FC = () => {
         <p className="mb-8 text-2xl md:text-3xl text-center font-semibold">
           Hello my name is Jason,
           <br />
-          I'm your friendly artifical developer.
+          I'm your friendly artificial developer.
         </p>
 
         <div className="sm:flex sm:items-end">
