@@ -24,7 +24,7 @@ const HomePage: React.FC = () => {
 
       <LibContainer className="pt-4 pb-8">
         <h1 className="text-4xl text-center font-bold !leading-tight sm:text-4xl md:text-5xl">
-          Affordable, AI-Generated Websites Specifically Built for Local
+          AI Generated and Managed Websites Specifically Built for Local
           Businesses
         </h1>
       </LibContainer>
