@@ -6,11 +6,17 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prisma": "npx prisma generate --watch",
+    "studio": "npx prisma studio"
+  },
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   },
   "dependencies": {
     "@heroicons/react": "^2.0.18",
-    "@types/node": "20.6.2",
+    "@prisma/client": "^5.4.1",
+    "@tailwindcss/typography": "^0.5.10",
     "@types/react": "18.2.21",
     "@types/react-dom": "18.2.7",
     "autoprefixer": "10.4.15",
@@ -20,6 +26,7 @@
     "next": "13.4.19",
     "pluralize": "^8.0.0",
     "postcss": "8.4.29",
+    "postmark": "^3.0.19",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.46.2",
@@ -27,6 +34,9 @@
     "typescript": "5.2.2"
   },
   "devDependencies": {
-    "@tailwindcss/forms": "^0.5.6"
+    "@tailwindcss/forms": "^0.5.6",
+    "@types/node": "^20.8.3",
+    "prisma": "^5.4.1",
+    "ts-node": "^10.9.1"
   }
 }

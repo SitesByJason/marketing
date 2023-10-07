@@ -1,0 +1,108 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  email      String   @unique @db.VarChar(255)
+  role       UserRole @default(Employee)
+  name       String   @db.VarChar(255)
+  bio        String?
+  avatarPath String?  @db.VarChar(255)
+  posts      Post[]
+}
+
+enum UserRole {
+  Owner
+  Employee
+  Guest
+}
+
+model Visitor {
+  id            Int            @id @default(autoincrement())
+  email         String         @unique @db.VarChar(255)
+  firstName     String?        @db.VarChar(255)
+  lastName      String?        @db.VarChar(255)
+  phoneNumber   String?        @db.VarChar(255)
+  businessType  String?        @db.VarChar(255)
+  notes         String?
+  avatarPath    String?        @db.VarChar(255)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  deletedAt     DateTime?
+  Conversations Conversation[]
+  comments      Comment[]
+}
+
+model Conversation {
+  id        Int       @id @default(autoincrement())
+  data      Json
+  messages  Json
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  visitor   Visitor   @relation(fields: [visitorId], references: [id])
+  visitorId Int
+}
+
+model Post {
+  id            Int        @id @default(autoincrement())
+  title         String     @db.VarChar(255)
+  slug          String     @db.VarChar(255)
+  excerpt       String?
+  content       String?
+  notes         String?
+  status        PostStatus @default(Idea)
+  allowcomments Boolean    @default(true)
+  publishAt     DateTime   @default(now())
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  deletedAt     DateTime?
+  author        User       @relation(fields: [authorId], references: [id])
+  authorId      Int
+  categories    Category[]
+  comments      Comment[]
+}
+
+enum PostStatus {
+  Idea
+  InProgress
+  InReview
+  Published
+}
+
+model Category {
+  id          Int     @id @default(autoincrement())
+  name        String  @db.VarChar(255)
+  slug        String  @db.VarChar(255)
+  description String?
+  posts       Post[]
+}
+
+model Comment {
+  id        Int           @id @default(autoincrement())
+  content   String
+  status    CommentStatus @default(PendingReview)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  deletedAt DateTime?
+  visitor   Visitor       @relation(fields: [visitorId], references: [id])
+  visitorId Int
+  replies   Comment[]     @relation("Replies")
+  parent    Comment       @relation("Replies", fields: [parentId], references: [id])
+  parentId  Int
+  Post      Post          @relation(fields: [postId], references: [id])
+  postId    Int
+}
+
+enum CommentStatus {
+  PendingReview
+  Visible
+  Blocked
+}
