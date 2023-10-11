@@ -75,7 +75,7 @@ const ConversationModal: React.FC = () => {
   return (
     <LibModal heading="Let's Talk" footer={content} onClose={onCloseModal}>
       <div className="flex flex-col h-full">
-        <div className="grow flex flex-col-reverse px-4 bg-slate-100">
+        <div className="grow flex flex-col-reverse px-4 bg-gray-100">
           {/* This needs to be here because of the flex-col-reverse */}
           <div ref={bottom} className="h-4" />
 

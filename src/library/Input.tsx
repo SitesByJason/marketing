@@ -16,7 +16,7 @@ const LibInput: React.FC<props> = ({
   error,
 }) => {
   let classes =
-    "w-full block border-slate-400 py-1 px-2 bg-white text-text text-md placeholder:text-slate-300 focus:ring-primary focus:ring-1 focus:ring-offset-2 focus:border-slate-400";
+    "w-full block border-gray-400 py-1 px-2 bg-white text-text text-md placeholder:text-gray-300 focus:ring-primary focus:ring-1 focus:ring-offset-2 focus:border-gray-400";
 
   if (error) {
     classes += " ring-1 ring-offset-2 ring-red";

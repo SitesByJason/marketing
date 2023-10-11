@@ -48,7 +48,7 @@ const ConversationItem: React.FC<props> = ({
 
   if (isVisitor) {
     rowClasses += " justify-end";
-    messageClasses += " bg-slate-300 text-text";
+    messageClasses += " bg-gray-300 text-text";
   }
 
   if (isPreviousSame) {

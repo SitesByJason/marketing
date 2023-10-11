@@ -18,7 +18,7 @@ const config: Config = {
     },
     colors: {
       transparent: "transparent",
-      slate: colors.slate,
+      gray: colors.gray,
       black: colors.black,
       white: colors.white,
       red: "#B22727",
